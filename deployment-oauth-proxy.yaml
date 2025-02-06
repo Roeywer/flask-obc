@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-obc-app
+  namespace: flask-obc 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-obc-app
+  template:
+    metadata:
+      labels:
+        app: flask-obc-app
+    spec:
+      serviceAccountName: oauth-proxy-sa
+      containers:
+        - name: flask-app
+          image: quay.io/roeywer/rhods-custom-image:flask-obc-v1
+          ports:
+          - containerPort: 8888
+          volumeMounts:
+             - name: flask-obc-sa-token
+               mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+               readOnly: true
+          env:
+            - name: OBC_ENDPOINT
+              value: "https://api.cluster.domain.com:6443"
+        - resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 100m
+              memory: 64Mi
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /oauth/healthz
+              port: oauth-proxy
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: oauth-proxy
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /oauth/healthz
+              port: oauth-proxy
+              scheme: HTTPS
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - containerPort: 8443
+              name: oauth-proxy
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /etc/oauth/config
+              name: oauth-config
+            - mountPath: /etc/tls/private
+              name: tls-certificates
+          image: >-
+            registry.redhat.io/openshift4/ose-oauth-proxy@sha256:4bef31eb993feb6f1096b51b4876c65a6fb1f4401fee97fa4f4542b6b7c9bc46
+          args:
+            - '--provider=openshift'
+            - '--https-address=:8443'
+            - '--http-address='
+            - '--openshift-service-account=oauth-proxy-sa'
+            - '--cookie-secret-file=/etc/oauth/config/cookie_secret'
+            - '--cookie-expire=24h0m0s'
+            - '--tls-cert=/etc/tls/private/tls.crt'
+            - '--tls-key=/etc/tls/private/tls.key'
+            - '--upstream=http://localhost:8888'
+            - '--upstream-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+            - '--email-domain=*'
+            - '--skip-provider-button'
+      enableServiceLinks: false
+      volumes:
+        - name: oauth-config
+          secret:
+            defaultMode: 420
+            secretName: flask-obc-oauth-config
+        - name: tls-certificates
+          secret:
+            defaultMode: 420
+            secretName: flask-obc-oauth-tls
+        - name: flask-obc-sa-token
+          secret:
+            secretName: flask-obc-token
+        - name: sa-oauth-proxy-token
+          secret:
+            secretName: oauth-proxy-token

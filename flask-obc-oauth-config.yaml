@@ -1,0 +1,9 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: flask-obc-oauth-config
+  namespace: flask-obc
+data:
+  cookie_secret: ZFVkUlZtazBiMk1yU1RVclZWaFBlRmw1YjI5MGR6MDk=
+type: Opaque
+

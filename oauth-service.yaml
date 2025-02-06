@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: flask-obc-oauth-svc
+  namespace: flask-obc
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: flask-obc-oauth-tls
+spec:
+  ports:
+    - name: oauth-proxy
+      protocol: TCP
+      port: 443
+      targetPort: oauth-proxy
+  internalTrafficPolicy: Cluster
+  selector:
+    app: flask-obc-app

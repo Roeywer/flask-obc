@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-obc-service
+  namespace: flask-obc
+spec:
+  selector:
+    app: flask-obc-app
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: 8888

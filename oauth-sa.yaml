@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: oauth-proxy-sa
+  annotations:
+    serviceaccounts.openshift.io/oauth-redirectreference.first: >-
+      {"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"flask-obc"}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: oauth-proxy-role
+  namespace: flask-obc
+rules:
+  - apiGroups: [""]
+    resources: ["users", "groups"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: oauth-proxy-rolebinding
+  namespace: flask-obc
+subjects:
+  - kind: ServiceAccount
+    name: oauth-proxy-sa
+    namespace: flask-obc
+roleRef:
+  kind: Role
+  name: oauth-proxy-role
+  apiGroup: rbac.authorization.k8s.io
