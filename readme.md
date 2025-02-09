@@ -24,7 +24,7 @@ The app is protected with Oauth Proxy. So you need to add permissions to the Ope
 2. Edit the deployment and route YAML files with the cluster API URL and `*.apps` URL.
 4. Create random cookie_secret: 
 ```bash
-oc -n flask-obc create secret generic flask-obc-oauth-config.yaml --from-literal=session_secret=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c43)
+oc -n flask-obc create secret generic flask-obc-oauth-config --from-literal=session_secret=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c43)
 ```
 5. Apply all YAML files.
 
