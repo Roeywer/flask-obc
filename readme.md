@@ -14,7 +14,12 @@ The app creates an Object Bucket Claim (OBC) in an existing project and adds `us
 - **Bucket Region**
 - **Bucket Endpoint URL**
 
-The app is protected with Oauth Proxy. So you need to add permissions to the Openshift AI Admin to grant access
+The app is secured with an OAuth Proxy, requiring view permissions to be granted to the appropriate user for access.
+
+```bash
+oc -n flask-obc adm policy add-role-to-user view user1
+```
+
 
 ![Output Screenshot](output.png)
 
@@ -42,7 +47,3 @@ oc -n flask-obc create secret generic flask-obc-oauth-config --from-literal=sess
 - [sa-secret.yaml](sa-secret.yaml)
 - [sa.yaml](sa.yaml)
 
-6. To grant access to a user you should add view role binding:
-```bash
-oc -n flask-obc adm policy add-role-to-user view user1
-```
