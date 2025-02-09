@@ -42,7 +42,7 @@ oc -n flask-obc create secret generic flask-obc-oauth-config --from-literal=sess
 - [sa-secret.yaml](sa-secret.yaml)
 - [sa.yaml](sa.yaml)
 
-6. To grant access to a user you should add rbac:
+6. To grant access to a user you should add view role binding:
 ```bash
 oc -n flask-obc adm policy add-role-to-user view user1
 ```
