@@ -22,7 +22,11 @@ The app is protected with Oauth Proxy. So you need to add permissions to the Ope
 
 1. Create a project named `flask-obc`.
 2. Edit the deployment and route YAML files with the cluster API URL and `*.apps` URL.
-3. Apply all YAML files.
+4. Create random cookie_secret: 
+```bash
+oc -n flask-obc create secret generic flask-obc-oauth-config.yaml --from-literal=session_secret=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c43)
+```
+5. Apply all YAML files.
 
 ## YAML Files
 
@@ -37,3 +41,8 @@ The app is protected with Oauth Proxy. So you need to add permissions to the Ope
 - [route.yaml](route.yaml)
 - [sa-secret.yaml](sa-secret.yaml)
 - [sa.yaml](sa.yaml)
+
+6. To grant access to a user you should add rbac:
+```bash
+oc -n flask-obc adm policy add-role-to-user view user1
+```
