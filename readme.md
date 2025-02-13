@@ -2,6 +2,8 @@
 
 Flask-OBC app helps non-OpenShift admin users to create Object Bucket Claims with OpenShift ODF for OpenShift AI data connection.
 
+![alt text](diagram.png)
+
 ![App Screenshot](app.png)
 
 ## Overview
